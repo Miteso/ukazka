@@ -141,7 +141,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding-top:30px}
     <aside class="rail" aria-label="Kuchyňa">
       <h2><span>Kuchyňa · tlačiareň</span><span id="count">čaká</span></h2>
       <div class="printer" id="printer"></div>
-      <div id="tickets"><div class="empty" id="empty">Tu vyjde skutočný bloček zo systému, hneď ako zákazník objednávku potvrdí.</div></div>
+      <div id="tickets"><div class="empty" id="empty">Ukážkový bloček ↓ Po vašom hovore tu vyjde skutočný.</div></div>
       <div class="facts">
         <div><b>24/7</b><span>bez prestávky</span></div>
         <div><b>0</b><span>zmeškaných hovorov</span></div>
@@ -321,7 +321,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding-top:30px}
   let printed=0;
   const BIG=/^(TEL:|ADRESA:|SPOLU:|DORUCIT DO:|PRIPRAVIT DO:)/;
   function printTicket(text){
-    $("empty")?.remove(); printed++;
+    $("empty")?.remove(); document.querySelectorAll("#tickets .sample").forEach(x=>x.remove()); printed++;
     $("count").textContent=printed+(printed===1?" bloček":printed<5?" bločky":" bločkov");
     const el=document.createElement("div"); el.className="ticket"+(reduce?"":" print");
     for(const line of String(text).replace(/\s+$/,"").split("\n")){
@@ -350,6 +350,9 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding-top:30px}
       ["Denná uzávierka","Po zatvorení sa sama vytlačí tržba za telefonické objednávky – počet, rozvoz/odber a doprava.",
        [C,"PIZZERIA","DENNY SUHRN 20.10.2026",C,"Pocet objednavok cez telefon: 22","  odber: 8   rozvoz: 14",L,"Objednavka   cas          suma","c. 45        16:33      8,50 EUR","c. 46        16:50      8,50 EUR","c. 47        16:53     10,00 EUR","c. 48        16:59     26,00 EUR","c. 49        17:07     30,50 EUR","...","c. 66        19:45     16,80 EUR","c. 67        20:04     22,80 EUR",L,"Z toho doprava: 23,00 EUR","TRZBA SPOLU:    409,00 EUR",C]]
     ];
+    { const t=document.createElement("div"); t.className="ticket sample";
+      for(const line of UK[0][2]){ const s=document.createElement("span"); if(BIG.test(line)) s.className="big"; s.textContent=line; t.append(s,document.createTextNode("\n")); }
+      $("tickets").append(t); }
     const box=$("ukazkyBlokov");
     for(const [nadpis,popis,riadky] of UK){
       const f=document.createElement("figure"), t=document.createElement("div"); t.className="ticket";
