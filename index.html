@@ -68,6 +68,12 @@ button:active{transform:scale(.97)}
 @keyframes print{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
 .ticket .big{font-weight:700;font-size:15px;display:inline-block}
 .ticket .call{color:#b8261f}
+.bloky{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;align-items:start}
+.bloky figure{margin:0;display:flex;flex-direction:column;gap:10px}
+.bloky figcaption{font-size:13px;color:var(--muted);line-height:1.4}
+.bloky figcaption b{color:var(--ink);display:block;font-size:14px;margin-bottom:2px}
+@media (max-width:1100px){.bloky{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:620px){.bloky{grid-template-columns:minmax(0,1fr)}}
 .empty{border:1px dashed var(--line);border-radius:14px;padding:22px;color:var(--muted);font-size:13.5px;text-align:center;background:var(--glass);backdrop-filter:blur(8px)}
 .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border-radius:14px;overflow:hidden}
 .facts div{background:var(--glass);padding:12px 8px;text-align:center;backdrop-filter:blur(8px)}
@@ -166,6 +172,12 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding-top:30px}
       <div class="card"><div class="ic">📊</div><h3>Prehľad a uzávierka</h3><p>Majiteľ vidí všetky bločky a dennú tržbu online. Po zatvorení sa vytlačí súhrn dňa.</p></div>
       <div class="card"><div class="ic">🕘</div><h3>Otváracie hodiny</h3><p>Mimo hodín objednávku neprijme a slušne povie, kedy otvárate. Deti odkáže na rodičov.</p></div>
     </div>
+  </section>
+
+  <section class="more" id="bloky">
+    <h2 class="sec-h">Takto vyzerajú bločky v kuchyni</h2>
+    <p class="sec-p">Každá objednávka sa sama vytlačí na malej tlačiarni. Dôležité údaje sú veľkým a tučným písmom, aby ich obsluha videla na prvý pohľad.</p>
+    <div class="bloky" id="ukazkyBlokov"></div>
   </section>
 
   <section class="more">
@@ -324,6 +336,28 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding-top:30px}
     bubble("sys","✓ objednávka vytlačená v kuchyni");
   }
 
+
+  /* ---------- ukazky blockov ---------- */
+  (function(){
+    const C="================================", L="--------------------------------";
+    const UK=[
+      ["Rozvoz","Telefón, adresa, čas doručenia a suma sú zvýraznené. Doprava sa pripočíta podľa obce.",
+       [C,"PIZZERIA","OBJEDNAVKA c. 48   18:42",C,"ROZVOZ","TEL: 0905123456","ADRESA: Kosice, Hlavna 12","MENO: Novak","DORUCIT DO: 19:40",L,"1x Molly 50cm - 17,00 EUR","1x Rodinna 33cm - 8,00 EUR","- bez kukurice (sunkova)","2x Pepsi 2 l - 3,50 EUR",L,"POZNAMKA: PLATBA: KARTA","Doprava: 1,50 EUR","SPOLU: 33,50 EUR"]],
+      ["Osobný odber s úpravami","Pol na pol, iný základ, syrový okraj aj extra syr – všetko na samostatných riadkoch s cenou.",
+       [C,"PIZZERIA","OBJEDNAVKA c. 49   18:47",C,"OSOBNY ODBER","TEL: 0918765432","ADRESA: -","MENO: Kovacova","PRIPRAVIT DO: 19:15",L,"1x Pol na pol 33cm: 1/2 Peklo","  (paradajkovy zaklad), 1/2 Nebo","  (smotanovy zaklad) - 10,00 EUR","  + syrovy okraj 33cm - 2,50 EUR","1x Combo 33cm (zaklad smotanovy)","  - 9,00 EUR","  + sunka - 0,00 EUR","  + niva - 0,00 EUR","  + slanina - 0,00 EUR","  + kukurica - 0,00 EUR","  + encian - 2,00 EUR",L,"POZNAMKA: PLATBA: HOTOVOST","SPOLU: 23,50 EUR"]],
+      ["Keď si agent nie je istý","Ak zákazník dvakrát zle nadiktuje adresu alebo číslo, agent to nezdržiava – bloček obsluhe povie, komu zavolať.",
+       [C,"PIZZERIA","OBJEDNAVKA c. 50   18:55",C,"ROZVOZ","TEL: 0944555666","ADRESA: Valaliky, Kostolna 81","MENO: Horvath","DORUCIT DO: 19:55","","!! ZAVOLAT ZAKAZNIKOVI !!","overit adresu","",L,"1x King of the Jungle menu","  (omacka cesnakova) - 14,00 EUR","1x Hranolky - 4,00 EUR",L,"POZNAMKA: PLATBA: HOTOVOST","OVERIT ADRESU - zavolat zakaznikovi","Doprava: 1,50 EUR","SPOLU: 19,50 EUR"]],
+      ["Denná uzávierka","Po zatvorení sa sama vytlačí tržba za telefonické objednávky – počet, rozvoz/odber a doprava.",
+       [C,"PIZZERIA","DENNY SUHRN 20.10.2026",C,"Pocet objednavok cez telefon: 22","  odber: 8   rozvoz: 14",L,"Objednavka   cas          suma","c. 45        16:33      8,50 EUR","c. 46        16:50      8,50 EUR","c. 47        16:53     10,00 EUR","c. 48        16:59     26,00 EUR","c. 49        17:07     30,50 EUR","...","c. 66        19:45     16,80 EUR","c. 67        20:04     22,80 EUR",L,"Z toho doprava: 23,00 EUR","TRZBA SPOLU:    409,00 EUR",C]]
+    ];
+    const box=$("ukazkyBlokov");
+    for(const [nadpis,popis,riadky] of UK){
+      const f=document.createElement("figure"), t=document.createElement("div"); t.className="ticket";
+      for(const line of riadky){ const s=document.createElement("span"); if(BIG.test(line)||/^TRZBA/.test(line)) s.className="big"; if(/ZAVOLAT|^overit/.test(line)) s.className="big call"; s.textContent=line; t.append(s,document.createTextNode("\n")); }
+      const c=document.createElement("figcaption"); c.innerHTML="<b></b>"; c.firstChild.textContent=nadpis; c.append(popis);
+      f.append(t,c); box.append(f);
+    }
+  })();
   /* ---------- real orders from the demo pizzeria ---------- */
   let maxSeen=null, pollUntil=0, polling=null;
   async function fetchOrders(){ const r=await fetch(API+"?k="+DEMO_KEY,{cache:"no-store"}); const d=await r.json(); return d.ok?d.objednavky:[]; }
